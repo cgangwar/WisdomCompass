@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Pen, Bell, Target, Brain, Share, BookMarked, Bookmark, RefreshCcw } from "lucide-react";
+import { Pen, Bell, Target, Brain, Share, BookMarked, Bookmark, RefreshCcw, Settings } from "lucide-react";
 import QuoteCard from "@/components/quote-card";
 import BottomNavigation from "@/components/bottom-navigation";
 import type { Quote, JournalEntry, Reminder } from "@shared/schema";
@@ -17,6 +17,7 @@ export default function Home() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const [startY, setStartY] = useState(0);
+  const [autoRefreshInterval, setAutoRefreshInterval] = useState<NodeJS.Timeout | null>(null);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -32,6 +33,8 @@ export default function Home() {
       return;
     }
   }, [isAuthenticated, isLoading, toast]);
+
+
 
   const { data: dailyQuote, isLoading: quoteLoading } = useQuery<Quote>({
     queryKey: ["/api/quotes/daily"],
@@ -112,6 +115,42 @@ export default function Home() {
     setStartY(0);
   }, [pullDistance, handleRefresh]);
 
+  // Auto-refresh functionality based on settings
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const autoRefreshEnabled = localStorage.getItem("inspire-auto-refresh") === "true";
+    const refreshDuration = localStorage.getItem("inspire-refresh-duration") || "10";
+    
+    if (autoRefreshEnabled) {
+      const intervalMs = parseInt(refreshDuration) * 60 * 1000; // Convert minutes to milliseconds
+      
+      const interval = setInterval(() => {
+        handleRefresh();
+      }, intervalMs);
+      
+      setAutoRefreshInterval(interval);
+      
+      return () => {
+        if (interval) clearInterval(interval);
+      };
+    } else {
+      if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        setAutoRefreshInterval(null);
+      }
+    }
+  }, [isAuthenticated, handleRefresh, autoRefreshInterval]);
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+      }
+    };
+  }, [autoRefreshInterval]);
+
   if (isLoading) {
     return <div className="min-h-screen bg-cream flex items-center justify-center">
       <div className="text-sage">Loading...</div>
@@ -137,14 +176,10 @@ export default function Home() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => window.location.href = "/api/logout"}
+              onClick={() => window.location.href = "/settings"}
               className="rounded-full hover:bg-sage/10 text-sage"
             >
-              <div className="w-8 h-8 bg-sage/10 rounded-full flex items-center justify-center">
-                <span className="text-xs font-medium">
-                  {(user as any)?.firstName?.charAt(0) || (user as any)?.email?.charAt(0) || "U"}
-                </span>
-              </div>
+              <Settings className="w-4 h-4" />
             </Button>
           </div>
         </div>
@@ -287,7 +322,7 @@ export default function Home() {
                   id: entry.id,
                   type: 'journal',
                   text: entry.text,
-                  createdAt: entry.createdAt!
+                  createdAt: entry.createdAt!.toString()
                 });
               });
             }
@@ -300,7 +335,7 @@ export default function Home() {
                   type: 'goal',
                   title: goal.title,
                   text: goal.content || goal.title,
-                  createdAt: goal.createdAt!
+                  createdAt: goal.createdAt!.toString()
                 });
               });
             }

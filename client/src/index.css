@@ -56,6 +56,16 @@
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(240, 4.9%, 83.9%);
   --radius: 0.5rem;
+  
+  /* Custom dark colors */
+  --sage: hsl(94, 17%, 60%);
+  --sage-light: hsl(94, 20%, 68%);
+  --sage-dark: hsl(94, 20%, 48%);
+  --cream: hsl(240, 10%, 3.9%);
+  --gold: hsl(33, 38%, 66%);
+  --gold-light: hsl(33, 45%, 74%);
+  --warm-gray: hsl(0, 0%, 98%);
+  --success: hsl(94, 28%, 59%);
 }
 
 @layer base {

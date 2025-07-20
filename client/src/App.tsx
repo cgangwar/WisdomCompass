@@ -11,6 +11,7 @@ import Journal from "@/pages/journal";
 import Quotes from "@/pages/quotes";
 import Goals from "@/pages/goals";
 import Reminders from "@/pages/reminders";
+import Settings from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -40,6 +41,7 @@ function Router() {
           <Route path="/quotes" component={Quotes} />
           <Route path="/goals" component={Goals} />
           <Route path="/reminders" component={Reminders} />
+          <Route path="/settings" component={Settings} />
         </>
       )}
       <Route component={NotFound} />
