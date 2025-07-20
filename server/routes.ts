@@ -151,6 +151,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Background image endpoint
+  app.get('/api/background-image', (req, res) => {
+    const backgroundImages = [
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600',
+      'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600',
+      'https://images.unsplash.com/photo-1518837695005-2083093ee35b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600',
+      'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600',
+      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600',
+      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600',
+      'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600'
+    ];
+    
+    const randomImage = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
+    res.json({ url: randomImage });
+  });
+
   // Journal routes
   app.get('/api/journal', isAuthenticated, async (req: any, res) => {
     try {

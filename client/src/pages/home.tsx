@@ -1,18 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Pen, Bell, Target, Brain, Share, BookMarked, Bookmark } from "lucide-react";
+import { Pen, Bell, Target, Brain, Share, BookMarked, Bookmark, RefreshCcw } from "lucide-react";
 import QuoteCard from "@/components/quote-card";
 import BottomNavigation from "@/components/bottom-navigation";
 import type { Quote, JournalEntry, Reminder } from "@shared/schema";
 
 export default function Home() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { isAuthenticated, isLoading, user } = useAuth();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [startY, setStartY] = useState(0);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -34,6 +38,12 @@ export default function Home() {
     retry: false,
   });
 
+  const { data: backgroundImage } = useQuery<{ url: string }>({
+    queryKey: ["/api/background-image"],
+    retry: false,
+    staleTime: 1000 * 60 * 30, // 30 minutes
+  });
+
   const { data: recentEntries } = useQuery<JournalEntry[]>({
     queryKey: ["/api/journal"],
     retry: false,
@@ -44,6 +54,63 @@ export default function Home() {
     retry: false,
     select: (data) => data?.filter(reminder => reminder.type === 'goal') || [],
   });
+
+  // Refresh functionality
+  const handleRefresh = useCallback(async () => {
+    if (isRefreshing) return;
+    
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["/api/quotes/daily"] }),
+        queryClient.invalidateQueries({ queryKey: ["/api/background-image"] }),
+        queryClient.invalidateQueries({ queryKey: ["/api/journal"] }),
+        queryClient.invalidateQueries({ queryKey: ["/api/reminders"] }),
+      ]);
+      
+      toast({
+        title: "Refreshed",
+        description: "Content has been updated",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to refresh content",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRefreshing(false);
+      setPullDistance(0);
+    }
+  }, [isRefreshing, queryClient, toast]);
+
+  // Pull-to-refresh handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (window.scrollY === 0) {
+      setStartY(e.touches[0].clientY);
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (startY === 0 || window.scrollY > 0) return;
+    
+    const currentY = e.touches[0].clientY;
+    const diff = currentY - startY;
+    
+    if (diff > 0) {
+      e.preventDefault();
+      setPullDistance(Math.min(diff * 0.5, 80));
+    }
+  }, [startY]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (pullDistance > 60) {
+      handleRefresh();
+    } else {
+      setPullDistance(0);
+    }
+    setStartY(0);
+  }, [pullDistance, handleRefresh]);
 
   if (isLoading) {
     return <div className="min-h-screen bg-cream flex items-center justify-center">
@@ -57,29 +124,63 @@ export default function Home() {
       <nav className="bg-white/90 backdrop-blur-sm sticky top-0 z-50 border-b border-sage/10">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-xl font-semibold text-sage">Inspire</h1>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => window.location.href = "/api/logout"}
-            className="rounded-full hover:bg-sage/10 text-sage"
-          >
-            <div className="w-8 h-8 bg-sage/10 rounded-full flex items-center justify-center">
-              <span className="text-xs font-medium">
-                {(user as any)?.firstName?.charAt(0) || (user as any)?.email?.charAt(0) || "U"}
-              </span>
-            </div>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="rounded-full hover:bg-sage/10 text-sage"
+            >
+              <RefreshCcw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => window.location.href = "/api/logout"}
+              className="rounded-full hover:bg-sage/10 text-sage"
+            >
+              <div className="w-8 h-8 bg-sage/10 rounded-full flex items-center justify-center">
+                <span className="text-xs font-medium">
+                  {(user as any)?.firstName?.charAt(0) || (user as any)?.email?.charAt(0) || "U"}
+                </span>
+              </div>
+            </Button>
+          </div>
         </div>
       </nav>
 
+      {/* Pull-to-refresh indicator */}
+      {pullDistance > 0 && (
+        <div 
+          className="fixed top-16 left-1/2 transform -translate-x-1/2 z-40 transition-opacity duration-200"
+          style={{ opacity: Math.min(pullDistance / 60, 1) }}
+        >
+          <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg border border-sage/20">
+            <RefreshCcw className={`w-5 h-5 text-sage ${pullDistance > 60 ? 'animate-spin' : ''}`} />
+          </div>
+        </div>
+      )}
+
       {/* Main Container */}
-      <div className="max-w-md mx-auto bg-white min-h-screen shadow-xl pb-20">
+      <div 
+        className="max-w-md mx-auto bg-white min-h-screen shadow-xl pb-20"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          transform: `translateY(${Math.min(pullDistance * 0.3, 24)}px)`,
+          transition: pullDistance === 0 ? 'transform 0.3s ease-out' : 'none'
+        }}
+      >
         {/* Daily Quote Section */}
         <div className="relative overflow-hidden">
           <div
-            className="h-64 bg-gradient-to-br from-sage to-sage-dark flex items-center justify-center text-white p-6"
+            className="h-64 bg-gradient-to-br from-sage to-sage-dark flex items-center justify-center text-white p-6 transition-all duration-500"
             style={{
-              backgroundImage: `linear-gradient(rgba(139, 154, 122, 0.8), rgba(107, 122, 90, 0.8)), url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600')`,
+              backgroundImage: backgroundImage?.url 
+                ? `linear-gradient(rgba(139, 154, 122, 0.8), rgba(107, 122, 90, 0.8)), url('${backgroundImage.url}')`
+                : `linear-gradient(rgba(139, 154, 122, 0.8), rgba(107, 122, 90, 0.8)), url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600')`,
               backgroundSize: "cover",
               backgroundPosition: "center"
             }}
