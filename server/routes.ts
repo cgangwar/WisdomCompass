@@ -121,16 +121,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const quoteId = parseInt(req.params.id);
       
+      console.log(`Pin request: userId=${userId}, quoteId=${quoteId}`);
+      
       const validation = insertPinnedQuoteSchema.safeParse({ quoteId });
       if (!validation.success) {
         return res.status(400).json({ message: "Invalid quote ID" });
       }
 
       await storage.pinQuote({ userId, quoteId });
+      console.log(`Quote ${quoteId} pinned successfully for user ${userId}`);
       res.json({ success: true });
     } catch (error) {
       console.error("Error pinning quote:", error);
-      res.status(500).json({ message: "Failed to pin quote" });
+      if (error.message === 'Quote is already pinned') {
+        res.status(400).json({ message: "Quote is already pinned" });
+      } else {
+        res.status(500).json({ message: "Failed to pin quote" });
+      }
     }
   });
 

@@ -150,7 +150,41 @@ export class DatabaseStorage implements IStorage {
   }
 
   async pinQuote(data: InsertPinnedQuote & { userId: string }): Promise<void> {
+    // Check if quote is already pinned
+    const [existingPin] = await db
+      .select()
+      .from(pinnedQuotes)
+      .where(and(
+        eq(pinnedQuotes.userId, data.userId),
+        eq(pinnedQuotes.quoteId, data.quoteId)
+      ));
+    
+    if (existingPin) {
+      throw new Error('Quote is already pinned');
+    }
+    
+    // Insert the pinned quote
     await db.insert(pinnedQuotes).values(data);
+    
+    // Get the quote details to create a reminder
+    const [quote] = await db
+      .select()
+      .from(quotes)
+      .where(eq(quotes.id, data.quoteId));
+    
+    if (quote) {
+      // Create a reminder for the pinned quote
+      await db.insert(reminders).values({
+        userId: data.userId,
+        title: "Daily Inspiration",
+        content: `"${quote.text}" — ${quote.author}`,
+        frequency: "daily",
+        time: "09:00",
+        type: "quote",
+        referenceId: quote.id,
+        isActive: true,
+      });
+    }
   }
 
   async getQuoteSuggestions(userId: string, text: string): Promise<Quote[]> {

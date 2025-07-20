@@ -38,9 +38,12 @@ export default function QuoteCard({ quote, variant = 'card' }: QuoteCardProps) {
         }, 500);
         return;
       }
+      const errorMessage = error.message.includes('already pinned') 
+        ? "Quote is already pinned to your reminders"
+        : "Failed to pin quote";
       toast({
         title: "Error",
-        description: "Failed to pin quote",
+        description: errorMessage,
         variant: "destructive",
       });
     },
