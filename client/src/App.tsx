@@ -28,7 +28,7 @@ function Router() {
         <Route path="/" component={Landing} />
       ) : (
         <>
-          {!user?.setupCompleted ? (
+          {!(user as any)?.setupCompleted ? (
             <Route path="/" component={Setup} />
           ) : (
             <Route path="/" component={Home} />

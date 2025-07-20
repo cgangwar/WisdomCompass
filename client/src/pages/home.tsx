@@ -59,7 +59,7 @@ export default function Home() {
           >
             <div className="w-8 h-8 bg-sage/10 rounded-full flex items-center justify-center">
               <span className="text-xs font-medium">
-                {user?.firstName?.charAt(0) || user?.email?.charAt(0) || "U"}
+                {(user as any)?.firstName?.charAt(0) || (user as any)?.email?.charAt(0) || "U"}
               </span>
             </div>
           </Button>
