@@ -336,7 +336,7 @@ export default function Home() {
                             <p className={`text-sm text-warm-gray line-clamp-2 ${
                               activity.type === 'goal' && activity.title ? 'text-xs' : ''
                             }`}>
-                              {activity.type === 'journal' ? `"${activity.text}"` : activity.text}
+                              {activity.text}
                             </p>
                             <p className="text-xs text-sage mt-1">
                               {activity.type === 'journal' ? 'Journal entry' : 'Goal created'} • {new Date(activity.createdAt).toLocaleDateString()}
