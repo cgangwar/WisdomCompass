@@ -6,15 +6,43 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Plus, Quote, Pen, ToggleLeft, ToggleRight } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { ArrowLeft, Plus, Quote, Pen, ToggleLeft, ToggleRight, Target } from "lucide-react";
 import BottomNavigation from "@/components/bottom-navigation";
 import type { Reminder } from "@shared/schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertReminderSchema } from "@shared/schema";
+import { z } from "zod";
+
+const reminderFormSchema = insertReminderSchema.extend({
+  time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Please enter a valid time in HH:MM format"),
+});
+
+type ReminderFormData = z.infer<typeof reminderFormSchema>;
 
 export default function Reminders() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isAuthenticated, isLoading } = useAuth();
   const [selectedFrequency, setSelectedFrequency] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  
+  const form = useForm<ReminderFormData>({
+    resolver: zodResolver(reminderFormSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+      frequency: "daily",
+      time: "09:00",
+      type: "goal",
+      referenceId: null,
+    },
+  });
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -64,6 +92,39 @@ export default function Reminders() {
     },
   });
 
+  const createReminderMutation = useMutation({
+    mutationFn: async (data: ReminderFormData) => {
+      await apiRequest("POST", "/api/reminders", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Reminder Created",
+        description: "Your new reminder has been added successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/reminders"] });
+      setShowAddDialog(false);
+      form.reset();
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to create reminder",
+        variant: "destructive",
+      });
+    },
+  });
+
   const filteredReminders = reminders?.filter(reminder => 
     reminder.frequency === selectedFrequency
   ) || [];
@@ -72,12 +133,18 @@ export default function Reminders() {
     toggleReminderMutation.mutate(reminderId);
   };
 
+  const onSubmit = (data: ReminderFormData) => {
+    createReminderMutation.mutate(data);
+  };
+
   const getIconForType = (type: string) => {
     switch (type) {
       case 'quote':
         return <Quote className="w-5 h-5 text-gold" />;
       case 'journal':
         return <Pen className="w-5 h-5 text-sage" />;
+      case 'goal':
+        return <Target className="w-5 h-5 text-blue-600" />;
       default:
         return <Quote className="w-5 h-5 text-sage" />;
     }
@@ -89,6 +156,8 @@ export default function Reminders() {
         return 'bg-gold/10';
       case 'journal':
         return 'bg-sage/10';
+      case 'goal':
+        return 'bg-blue-50';
       default:
         return 'bg-sage/10';
     }
@@ -118,7 +187,7 @@ export default function Reminders() {
             variant="ghost"
             size="icon"
             className="rounded-full hover:bg-sage/10 text-sage"
-            disabled
+            onClick={() => setShowAddDialog(true)}
           >
             <Plus className="w-5 h-5" />
           </Button>
@@ -224,13 +293,140 @@ export default function Reminders() {
           <Button
             variant="outline"
             className="w-full bg-sage/10 text-sage py-4 rounded-xl font-medium hover:bg-sage/20 border-2 border-dashed border-sage/30"
-            disabled
+            onClick={() => setShowAddDialog(true)}
           >
             <Plus className="w-4 h-4 mr-2" />
             Add New Reminder
           </Button>
         </div>
       </div>
+
+      {/* Add Reminder Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create New Reminder</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Daily Affirmation" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Content</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Enter your reminder content..."
+                        rows={3}
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="frequency"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Frequency</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select frequency" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="daily">Daily</SelectItem>
+                          <SelectItem value="weekly">Weekly</SelectItem>
+                          <SelectItem value="monthly">Monthly</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="time"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Time</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="time"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="goal">Personal Goal</SelectItem>
+                        <SelectItem value="quote">Inspirational Quote</SelectItem>
+                        <SelectItem value="journal">Journal Prompt</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex space-x-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAddDialog(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createReminderMutation.isPending}
+                  className="flex-1 bg-sage hover:bg-sage/90 text-white"
+                >
+                  {createReminderMutation.isPending ? "Creating..." : "Create Reminder"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <BottomNavigation currentPage="reminders" />
     </div>
