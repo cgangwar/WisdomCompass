@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { BookMarked, Share, Bookmark } from "lucide-react";
+import { BookMarked, Share, Bell } from "lucide-react";
 import type { Quote } from "@shared/schema";
 
 interface QuoteCardProps {
@@ -130,7 +130,7 @@ export default function QuoteCard({ quote, variant = 'card' }: QuoteCardProps) {
             disabled={pinQuoteMutation.isPending}
             className="p-2 bg-white/20 rounded-full hover:bg-white/30"
           >
-            <Bookmark className="w-4 h-4" />
+            <Bell className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost"
@@ -168,7 +168,7 @@ export default function QuoteCard({ quote, variant = 'card' }: QuoteCardProps) {
           disabled={pinQuoteMutation.isPending}
           className="p-2 hover:bg-sage/10 text-sage"
         >
-          <Bookmark className="w-4 h-4" />
+          <Bell className="w-4 h-4" />
         </Button>
       </div>
     </div>
