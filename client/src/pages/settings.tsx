@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,10 +16,8 @@ type RefreshDuration = "1" | "5" | "10" | "30" | "60";
 
 export default function Settings() {
   const { isAuthenticated, isLoading } = useAuth();
+  const { theme, setTheme } = useTheme();
   const { toast } = useToast();
-  
-  // Theme state
-  const [theme, setTheme] = useState<Theme>("auto");
   
   // Auto refresh state
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(false);
@@ -44,35 +43,12 @@ export default function Settings() {
 
   // Load saved settings from localStorage
   useEffect(() => {
-    const savedTheme = localStorage.getItem("inspire-theme") as Theme;
     const savedAutoRefresh = localStorage.getItem("inspire-auto-refresh") === "true";
     const savedDuration = localStorage.getItem("inspire-refresh-duration") as RefreshDuration;
     
-    if (savedTheme) setTheme(savedTheme);
     if (savedAutoRefresh !== null) setAutoRefreshEnabled(savedAutoRefresh);
     if (savedDuration) setRefreshDuration(savedDuration);
   }, []);
-
-  // Apply theme changes
-  useEffect(() => {
-    const root = document.documentElement;
-    
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else if (theme === "light") {
-      root.classList.remove("dark");
-    } else {
-      // Auto theme - use system preference
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      if (prefersDark) {
-        root.classList.add("dark");
-      } else {
-        root.classList.remove("dark");
-      }
-    }
-    
-    localStorage.setItem("inspire-theme", theme);
-  }, [theme]);
 
   // Save auto refresh settings
   useEffect(() => {
