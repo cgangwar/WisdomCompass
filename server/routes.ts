@@ -242,6 +242,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch('/api/reminders/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const reminderId = parseInt(req.params.id);
+      const validation = insertReminderSchema.pick({
+        title: true,
+        content: true,
+        frequency: true,
+        time: true,
+      }).safeParse(req.body);
+      
+      if (!validation.success) {
+        return res.status(400).json({ message: "Invalid reminder data" });
+      }
+
+      const reminder = await storage.updateReminder(userId, reminderId, validation.data);
+      res.json(reminder);
+    } catch (error) {
+      console.error("Error updating reminder:", error);
+      res.status(500).json({ message: "Failed to update reminder" });
+    }
+  });
+
+  app.delete('/api/reminders/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const reminderId = parseInt(req.params.id);
+      
+      await storage.deleteReminder(userId, reminderId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting reminder:", error);
+      res.status(500).json({ message: "Failed to delete reminder" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

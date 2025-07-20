@@ -264,6 +264,38 @@ export class DatabaseStorage implements IStorage {
 
     return updated;
   }
+
+  async updateReminder(userId: string, reminderId: number, data: Partial<InsertReminder>): Promise<Reminder> {
+    const [reminder] = await db
+      .select()
+      .from(reminders)
+      .where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
+
+    if (!reminder) {
+      throw new Error('Reminder not found');
+    }
+
+    const [updated] = await db
+      .update(reminders)
+      .set(data)
+      .where(eq(reminders.id, reminderId))
+      .returning();
+
+    return updated;
+  }
+
+  async deleteReminder(userId: string, reminderId: number): Promise<void> {
+    const [reminder] = await db
+      .select()
+      .from(reminders)
+      .where(and(eq(reminders.id, reminderId), eq(reminders.userId, userId)));
+
+    if (!reminder) {
+      throw new Error('Reminder not found');
+    }
+
+    await db.delete(reminders).where(eq(reminders.id, reminderId));
+  }
 }
 
 export const storage = new DatabaseStorage();

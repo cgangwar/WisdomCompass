@@ -10,8 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ArrowLeft, Plus, Quote, Pen, ToggleLeft, ToggleRight, Target } from "lucide-react";
+import { ArrowLeft, Plus, Quote, Pen, ToggleLeft, ToggleRight, Target, Edit, Trash2, MoreVertical } from "lucide-react";
 import BottomNavigation from "@/components/bottom-navigation";
 import type { Reminder } from "@shared/schema";
 import { useForm } from "react-hook-form";
@@ -31,6 +32,7 @@ export default function Reminders() {
   const { isAuthenticated, isLoading } = useAuth();
   const [selectedFrequency, setSelectedFrequency] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   
   const form = useForm<ReminderFormData>({
     resolver: zodResolver(reminderFormSchema),
@@ -125,6 +127,70 @@ export default function Reminders() {
     },
   });
 
+  const updateReminderMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: ReminderFormData }) => {
+      await apiRequest("PATCH", `/api/reminders/${id}`, data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Reminder Updated",
+        description: "Your reminder has been updated successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/reminders"] });
+      setEditingReminder(null);
+      form.reset();
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to update reminder",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteReminderMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/reminders/${id}`, {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Reminder Deleted",
+        description: "Your reminder has been deleted successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/reminders"] });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to delete reminder",
+        variant: "destructive",
+      });
+    },
+  });
+
   const filteredReminders = reminders?.filter(reminder => 
     reminder.frequency === selectedFrequency
   ) || [];
@@ -134,7 +200,36 @@ export default function Reminders() {
   };
 
   const onSubmit = (data: ReminderFormData) => {
-    createReminderMutation.mutate(data);
+    if (editingReminder) {
+      updateReminderMutation.mutate({ id: editingReminder.id, data });
+    } else {
+      createReminderMutation.mutate(data);
+    }
+  };
+
+  const handleEditReminder = (reminder: Reminder) => {
+    setEditingReminder(reminder);
+    form.reset({
+      title: reminder.title,
+      content: reminder.content || "",
+      frequency: reminder.frequency,
+      time: reminder.time,
+      type: reminder.type,
+      referenceId: reminder.referenceId,
+    });
+    setShowAddDialog(true);
+  };
+
+  const handleDeleteReminder = (id: number) => {
+    if (window.confirm("Are you sure you want to delete this reminder?")) {
+      deleteReminderMutation.mutate(id);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setShowAddDialog(false);
+    setEditingReminder(null);
+    form.reset();
   };
 
   const getIconForType = (type: string) => {
@@ -248,9 +343,35 @@ export default function Reminders() {
                         {getIconForType(reminder.type)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-warm-gray mb-1">
-                          {reminder.title}
-                        </p>
+                        <div className="flex items-start justify-between mb-1">
+                          <p className="text-sm font-medium text-warm-gray">
+                            {reminder.title}
+                          </p>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-sage/50 hover:text-sage"
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleEditReminder(reminder)}>
+                                <Edit className="w-4 h-4 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleDeleteReminder(reminder.id)}
+                                className="text-red-600"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                         <p className="text-xs text-sage leading-relaxed mb-3">
                           {reminder.content}
                         </p>
@@ -302,10 +423,10 @@ export default function Reminders() {
       </div>
 
       {/* Add Reminder Dialog */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+      <Dialog open={showAddDialog} onOpenChange={handleCloseDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Create New Reminder</DialogTitle>
+            <DialogTitle>{editingReminder ? 'Edit Reminder' : 'Create New Reminder'}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -410,17 +531,21 @@ export default function Reminders() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setShowAddDialog(false)}
+                  onClick={handleCloseDialog}
                   className="flex-1"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  disabled={createReminderMutation.isPending}
+                  disabled={createReminderMutation.isPending || updateReminderMutation.isPending}
                   className="flex-1 bg-sage hover:bg-sage/90 text-white"
                 >
-                  {createReminderMutation.isPending ? "Creating..." : "Create Reminder"}
+                  {editingReminder ? (
+                    updateReminderMutation.isPending ? "Updating..." : "Update Reminder"
+                  ) : (
+                    createReminderMutation.isPending ? "Creating..." : "Create Reminder"
+                  )}
                 </Button>
               </div>
             </form>
