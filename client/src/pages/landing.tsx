@@ -12,7 +12,7 @@ export default function Landing() {
       {/* Navigation Header */}
       <nav className="bg-card/90 backdrop-blur-sm sticky top-0 z-50 border-b border-border">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-sage">Inspire</h1>
+          <h1 className="text-xl font-semibold text-sage">Wisdom Compass</h1>
           <Button onClick={handleLogin} variant="outline" size="sm" className="border-sage text-sage hover:bg-sage hover:text-white">
             Sign In
           </Button>
@@ -27,7 +27,7 @@ export default function Landing() {
             <div className="w-20 h-20 bg-sage/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <Quote className="w-10 h-10 text-sage" />
             </div>
-            <h1 className="text-3xl font-bold text-card-foreground">Welcome to Inspire</h1>
+            <h1 className="text-3xl font-bold text-card-foreground">Welcome to Wisdom Compass</h1>
             <p className="text-sage text-lg leading-relaxed">
               Your personal companion for daily inspiration, mindful journaling, and meaningful growth.
             </p>

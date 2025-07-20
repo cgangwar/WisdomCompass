@@ -1,8 +1,8 @@
-# Inspire - Personal Growth & Reflection App
+# Wisdom Compass - Personal Growth & Reflection App
 
 ## Overview
 
-Inspire is a full-stack web application that provides users with personalized daily inspiration through curated quotes, philosophical teachings, and journaling capabilities. The app helps users discover wisdom from historical figures and philosophical traditions while maintaining a personal journal for reflection and growth.
+Wisdom Compass is a full-stack web application that provides users with personalized daily inspiration through curated quotes, philosophical teachings, and journaling capabilities. The app helps users discover wisdom from historical figures and philosophical traditions while maintaining a personal journal for reflection and growth.
 
 **Current Status:** P1 MVP features fully implemented and functional. Application successfully running with complete authentication, setup flow, daily quotes, journaling, reminder system, and full dark mode support. Ready for deployment.
 
