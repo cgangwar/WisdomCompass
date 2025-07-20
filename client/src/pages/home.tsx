@@ -132,7 +132,7 @@ export default function Home() {
             <Button
               variant="outline"
               className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-left border border-sage/10 h-auto"
-              disabled
+              onClick={() => window.location.href = "/goals"}
             >
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-success/10 rounded-full flex items-center justify-center">
