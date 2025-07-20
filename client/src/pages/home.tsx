@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Pen, Bell, Target, Brain, Share, BookMarked, Bookmark } from "lucide-react";
 import QuoteCard from "@/components/quote-card";
 import BottomNavigation from "@/components/bottom-navigation";
-import type { Quote, JournalEntry } from "@shared/schema";
+import type { Quote, JournalEntry, Reminder } from "@shared/schema";
 
 export default function Home() {
   const { toast } = useToast();
@@ -37,6 +37,12 @@ export default function Home() {
   const { data: recentEntries } = useQuery<JournalEntry[]>({
     queryKey: ["/api/journal"],
     retry: false,
+  });
+
+  const { data: goals } = useQuery<Reminder[]>({
+    queryKey: ["/api/reminders"],
+    retry: false,
+    select: (data) => data?.filter(reminder => reminder.type === 'goal') || [],
   });
 
   if (isLoading) {
@@ -163,32 +169,86 @@ export default function Home() {
           </div>
 
           {/* Recent Activity */}
-          {recentEntries && recentEntries.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-warm-gray">Recent Activity</h3>
-              <div className="space-y-3">
-                {recentEntries.slice(0, 2).map((entry) => (
-                  <Card key={entry.id} className="shadow-sm border border-sage/10">
-                    <CardContent className="p-4">
-                      <div className="flex items-start space-x-3">
-                        <div className="w-8 h-8 bg-sage/10 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Pen className="w-4 h-4 text-sage" />
+          {(() => {
+            // Combine journal entries and goals into a single activity feed
+            const allActivities: Array<{
+              id: number;
+              type: 'journal' | 'goal';
+              title?: string;
+              text: string;
+              createdAt: string;
+            }> = [];
+
+            // Add journal entries
+            if (recentEntries) {
+              recentEntries.forEach(entry => {
+                allActivities.push({
+                  id: entry.id,
+                  type: 'journal',
+                  text: entry.text,
+                  createdAt: entry.createdAt!
+                });
+              });
+            }
+
+            // Add goals
+            if (goals) {
+              goals.forEach(goal => {
+                allActivities.push({
+                  id: goal.id,
+                  type: 'goal',
+                  title: goal.title,
+                  text: goal.content || goal.title,
+                  createdAt: goal.createdAt!
+                });
+              });
+            }
+
+            // Sort by creation date (newest first) and take top 3
+            const sortedActivities = allActivities
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .slice(0, 3);
+
+            return sortedActivities.length > 0 ? (
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-warm-gray">Recent Activity</h3>
+                <div className="space-y-3">
+                  {sortedActivities.map((activity) => (
+                    <Card key={`${activity.type}-${activity.id}`} className="shadow-sm border border-sage/10">
+                      <CardContent className="p-4">
+                        <div className="flex items-start space-x-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            activity.type === 'journal' ? 'bg-sage/10' : 'bg-blue-50'
+                          }`}>
+                            {activity.type === 'journal' ? (
+                              <Pen className="w-4 h-4 text-sage" />
+                            ) : (
+                              <Target className="w-4 h-4 text-blue-600" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            {activity.type === 'goal' && activity.title && (
+                              <p className="text-sm font-medium text-warm-gray mb-1">
+                                {activity.title}
+                              </p>
+                            )}
+                            <p className={`text-sm text-warm-gray line-clamp-2 ${
+                              activity.type === 'goal' && activity.title ? 'text-xs' : ''
+                            }`}>
+                              {activity.type === 'journal' ? `"${activity.text}"` : activity.text}
+                            </p>
+                            <p className="text-xs text-sage mt-1">
+                              {activity.type === 'journal' ? 'Journal entry' : 'Goal created'} • {new Date(activity.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-warm-gray line-clamp-2">
-                            "{entry.text}"
-                          </p>
-                          <p className="text-xs text-sage mt-1">
-                            Journal entry • {new Date(entry.createdAt!).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            ) : null;
+          })()}
         </div>
       </div>
 
