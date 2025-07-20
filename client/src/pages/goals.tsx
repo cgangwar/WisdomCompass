@@ -145,9 +145,9 @@ export default function Goals() {
   }
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-background">
       {/* Navigation Header */}
-      <nav className="bg-white/90 backdrop-blur-sm sticky top-0 z-50 border-b border-sage/10">
+      <nav className="bg-card/90 backdrop-blur-sm sticky top-0 z-50 border-b border-border">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <Button
             variant="ghost"
@@ -157,7 +157,7 @@ export default function Goals() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h2 className="text-lg font-medium text-warm-gray">Goals</h2>
+          <h2 className="text-lg font-medium text-card-foreground">Goals</h2>
           <Button
             variant="ghost"
             size="icon"
@@ -170,14 +170,14 @@ export default function Goals() {
       </nav>
 
       {/* Main Container */}
-      <div className="max-w-md mx-auto bg-white min-h-screen shadow-xl pb-20">
+      <div className="max-w-md mx-auto bg-card min-h-screen shadow-xl pb-20">
         <div className="p-6 space-y-6">
           {/* Goals Header */}
           <div className="text-center space-y-2">
             <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto">
               <Target className="w-8 h-8 text-blue-600" />
             </div>
-            <h3 className="text-lg font-medium text-warm-gray">Personal Goals</h3>
+            <h3 className="text-lg font-medium text-card-foreground">Personal Goals</h3>
             <p className="text-sm text-sage">Track your aspirations and achievements</p>
           </div>
 
@@ -185,14 +185,14 @@ export default function Goals() {
           {goals && goals.length > 0 ? (
             <div className="space-y-4">
               {goals.map((goal) => (
-                <Card key={goal.id} className="shadow-sm border border-sage/10">
+                <Card key={goal.id} className="shadow-sm border border-border">
                   <CardContent className="p-4">
                     <div className="flex items-start space-x-3">
                       <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
                         <Target className="w-5 h-5 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-warm-gray mb-1">
+                        <p className="text-sm font-medium text-card-foreground mb-1">
                           {goal.title}
                         </p>
                         <p className="text-xs text-sage leading-relaxed mb-3">
@@ -228,7 +228,7 @@ export default function Goals() {
               <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Target className="w-8 h-8 text-blue-600" />
               </div>
-              <h3 className="text-lg font-medium text-warm-gray mb-2">No goals yet</h3>
+              <h3 className="text-lg font-medium text-card-foreground mb-2">No goals yet</h3>
               <p className="text-sage text-sm mb-4">
                 Create your first goal to start tracking your progress.
               </p>

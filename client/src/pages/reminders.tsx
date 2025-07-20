@@ -259,15 +259,15 @@ export default function Reminders() {
   };
 
   if (isLoading) {
-    return <div className="min-h-screen bg-cream flex items-center justify-center">
+    return <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-sage">Loading...</div>
     </div>;
   }
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-background">
       {/* Navigation Header */}
-      <nav className="bg-white/90 backdrop-blur-sm sticky top-0 z-50 border-b border-sage/10">
+      <nav className="bg-card/90 backdrop-blur-sm sticky top-0 z-50 border-b border-border">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <Button
             variant="ghost"
@@ -277,7 +277,7 @@ export default function Reminders() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h2 className="text-lg font-medium text-warm-gray">Reminders</h2>
+          <h2 className="text-lg font-medium text-card-foreground">Reminders</h2>
           <Button
             variant="ghost"
             size="icon"
@@ -290,7 +290,7 @@ export default function Reminders() {
       </nav>
 
       {/* Main Container */}
-      <div className="max-w-md mx-auto bg-white min-h-screen shadow-xl pb-20">
+      <div className="max-w-md mx-auto bg-card min-h-screen shadow-xl pb-20">
         <div className="p-6 space-y-6">
           {/* Frequency Tabs */}
           <div className="flex space-x-1 bg-sage/10 p-1 rounded-lg">

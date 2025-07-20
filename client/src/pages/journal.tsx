@@ -95,15 +95,15 @@ export default function Journal() {
   };
 
   if (isLoading) {
-    return <div className="min-h-screen bg-cream flex items-center justify-center">
+    return <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-sage">Loading...</div>
     </div>;
   }
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-background">
       {/* Navigation Header */}
-      <nav className="bg-white/90 backdrop-blur-sm sticky top-0 z-50 border-b border-sage/10">
+      <nav className="bg-card/90 backdrop-blur-sm sticky top-0 z-50 border-b border-border">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <Button
             variant="ghost"
@@ -113,7 +113,7 @@ export default function Journal() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h2 className="text-lg font-medium text-warm-gray">Journal</h2>
+          <h2 className="text-lg font-medium text-card-foreground">Journal</h2>
           <Button
             variant="ghost"
             size="icon"
@@ -126,20 +126,20 @@ export default function Journal() {
       </nav>
 
       {/* Main Container */}
-      <div className="max-w-md mx-auto bg-white min-h-screen shadow-xl pb-20">
+      <div className="max-w-md mx-auto bg-card min-h-screen shadow-xl pb-20">
         <div className="p-6 space-y-6">
           {/* One-line Journal Input */}
-          <Card className="shadow-sm border border-sage/10">
+          <Card className="shadow-sm border border-border">
             <CardContent className="p-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-warm-gray mb-2">
+                <label className="block text-sm font-medium text-card-foreground mb-2">
                   Today's reflection
                 </label>
                 <Textarea
                   placeholder="What's on your mind today? One meaningful line..."
                   value={journalText}
                   onChange={(e) => setJournalText(e.target.value)}
-                  className="w-full p-3 bg-cream rounded-lg border-0 resize-none focus:ring-2 focus:ring-sage/20"
+                  className="w-full p-3 bg-background rounded-lg border-0 resize-none focus:ring-2 focus:ring-sage/20"
                   rows={3}
                 />
               </div>
@@ -157,7 +157,7 @@ export default function Journal() {
                         className="text-left w-full p-3 bg-sage/5 rounded-lg hover:bg-sage/10 border-sage/20 h-auto"
                       >
                         <div>
-                          <p className="text-sm text-warm-gray font-serif leading-relaxed">
+                          <p className="text-sm text-card-foreground font-serif leading-relaxed">
                             "{quote.text}"
                           </p>
                           <p className="text-xs text-sage mt-1">— {quote.author}</p>
@@ -188,14 +188,14 @@ export default function Journal() {
           {/* Recent Entries */}
           {entries && entries.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-warm-gray">Recent Entries</h3>
+              <h3 className="text-lg font-medium text-card-foreground">Recent Entries</h3>
               <div className="space-y-3">
                 {entries.map((entry) => (
-                  <Card key={entry.id} className="shadow-sm border border-sage/10">
+                  <Card key={entry.id} className="shadow-sm border border-border">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-sm text-warm-gray mb-2">
+                          <p className="text-sm text-card-foreground mb-2">
                             "{entry.text}"
                           </p>
                           <p className="text-xs text-sage">

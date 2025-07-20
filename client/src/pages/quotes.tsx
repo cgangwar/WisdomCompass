@@ -49,15 +49,15 @@ export default function Quotes() {
   ) || [];
 
   if (isLoading) {
-    return <div className="min-h-screen bg-cream flex items-center justify-center">
+    return <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-sage">Loading...</div>
     </div>;
   }
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-background">
       {/* Navigation Header */}
-      <nav className="bg-white/90 backdrop-blur-sm sticky top-0 z-50 border-b border-sage/10">
+      <nav className="bg-card/90 backdrop-blur-sm sticky top-0 z-50 border-b border-border">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <Button
             variant="ghost"
@@ -67,13 +67,13 @@ export default function Quotes() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h2 className="text-lg font-medium text-warm-gray">Quotes</h2>
+          <h2 className="text-lg font-medium text-card-foreground">Quotes</h2>
           <div className="w-10" /> {/* Spacer */}
         </div>
       </nav>
 
       {/* Main Container */}
-      <div className="max-w-md mx-auto bg-white min-h-screen shadow-xl pb-20">
+      <div className="max-w-md mx-auto bg-card min-h-screen shadow-xl pb-20">
         <div className="p-6 space-y-6">
           {/* Search Bar */}
           <div className="relative">
@@ -89,7 +89,7 @@ export default function Quotes() {
           {/* Today's Quote */}
           {dailyQuote && !searchTerm && (
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-warm-gray flex items-center">
+              <h3 className="text-sm font-medium text-card-foreground flex items-center">
                 <QuoteIcon className="w-4 h-4 mr-2 text-sage" />
                 Today's Quote
               </h3>
@@ -99,7 +99,7 @@ export default function Quotes() {
 
           {/* All Quotes */}
           <div className="space-y-3">
-            <h3 className="text-sm font-medium text-warm-gray flex items-center">
+            <h3 className="text-sm font-medium text-card-foreground flex items-center">
               <BookMarked className="w-4 h-4 mr-2 text-sage" />
               {searchTerm ? `Search Results (${filteredQuotes.length})` : 'All Quotes'}
             </h3>
@@ -121,7 +121,7 @@ export default function Quotes() {
                 <div className="w-16 h-16 bg-sage/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <QuoteIcon className="w-8 h-8 text-sage" />
                 </div>
-                <h3 className="text-lg font-medium text-warm-gray mb-2">
+                <h3 className="text-lg font-medium text-card-foreground mb-2">
                   {searchTerm ? 'No quotes found' : 'No quotes available'}
                 </h3>
                 <p className="text-sage text-sm">

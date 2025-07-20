@@ -7,7 +7,7 @@ interface BottomNavigationProps {
 
 export default function BottomNavigation({ currentPage }: BottomNavigationProps) {
   return (
-    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-sage/10 px-6 py-3">
+    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-card border-t border-border px-6 py-3">
       <div className="flex justify-around">
         <Button
           variant="ghost"

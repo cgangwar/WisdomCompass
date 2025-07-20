@@ -146,8 +146,8 @@ export default function QuoteCard({ quote, variant = 'card' }: QuoteCardProps) {
   }
 
   return (
-    <div className="p-4 bg-white rounded-xl shadow-sm border border-sage/10">
-      <blockquote className="text-sm font-serif text-warm-gray mb-2">
+    <div className="p-4 bg-card rounded-xl shadow-sm border border-border">
+      <blockquote className="text-sm font-serif text-card-foreground mb-2">
         "{quote.text}"
       </blockquote>
       <cite className="text-xs text-sage">— {quote.author}</cite>
