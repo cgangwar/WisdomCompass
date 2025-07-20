@@ -19,7 +19,7 @@ export function useTheme() {
 }
 
 export function useThemeLogic() {
-  const [theme, setTheme] = useState<Theme>("auto");
+  const [theme, setTheme] = useState<Theme>("light");
   const [isDark, setIsDark] = useState(false);
 
   // Load saved theme from localStorage
@@ -27,6 +27,9 @@ export function useThemeLogic() {
     const savedTheme = localStorage.getItem("inspire-theme") as Theme;
     if (savedTheme) {
       setTheme(savedTheme);
+    } else {
+      // Default to light mode
+      setTheme("light");
     }
   }, []);
 
