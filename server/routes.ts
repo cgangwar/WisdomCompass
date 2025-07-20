@@ -116,6 +116,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/quotes/all', isAuthenticated, async (req: any, res) => {
+    try {
+      const quotes = await storage.getAllQuotes();
+      res.json(quotes);
+    } catch (error) {
+      console.error("Error fetching all quotes:", error);
+      res.status(500).json({ message: "Failed to fetch quotes" });
+    }
+  });
+
   app.post('/api/quotes/:id/pin', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;

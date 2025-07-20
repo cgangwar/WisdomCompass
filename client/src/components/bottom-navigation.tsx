@@ -31,16 +31,20 @@ export default function BottomNavigation({ currentPage }: BottomNavigationProps)
         </Button>
         <Button
           variant="ghost"
-          disabled
-          className="flex flex-col items-center space-y-1 text-sage/50"
+          onClick={() => window.location.href = "/quotes"}
+          className={`flex flex-col items-center space-y-1 ${
+            currentPage === 'quotes' ? 'text-sage' : 'text-sage/50 hover:text-sage'
+          }`}
         >
           <Quote className="w-5 h-5" />
           <span className="text-xs">Quotes</span>
         </Button>
         <Button
           variant="ghost"
-          disabled
-          className="flex flex-col items-center space-y-1 text-sage/50"
+          onClick={() => window.location.href = "/goals"}
+          className={`flex flex-col items-center space-y-1 ${
+            currentPage === 'goals' ? 'text-sage' : 'text-sage/50 hover:text-sage'
+          }`}
         >
           <Target className="w-5 h-5" />
           <span className="text-xs">Goals</span>

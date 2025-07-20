@@ -8,6 +8,8 @@ import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 import Setup from "@/pages/setup";
 import Journal from "@/pages/journal";
+import Quotes from "@/pages/quotes";
+import Goals from "@/pages/goals";
 import Reminders from "@/pages/reminders";
 import NotFound from "@/pages/not-found";
 
@@ -35,6 +37,8 @@ function Router() {
           )}
           <Route path="/setup" component={Setup} />
           <Route path="/journal" component={Journal} />
+          <Route path="/quotes" component={Quotes} />
+          <Route path="/goals" component={Goals} />
           <Route path="/reminders" component={Reminders} />
         </>
       )}

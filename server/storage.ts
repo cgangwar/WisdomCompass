@@ -149,6 +149,10 @@ export class DatabaseStorage implements IStorage {
     return quote;
   }
 
+  async getAllQuotes(): Promise<Quote[]> {
+    return await db.select().from(quotes).orderBy(quotes.author, quotes.text);
+  }
+
   async pinQuote(data: InsertPinnedQuote & { userId: string }): Promise<void> {
     // Check if quote is already pinned
     const [existingPin] = await db
