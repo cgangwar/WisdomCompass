@@ -152,15 +152,15 @@ export default function Home() {
   }, [autoRefreshInterval]);
 
   if (isLoading) {
-    return <div className="min-h-screen bg-cream flex items-center justify-center">
+    return <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-sage">Loading...</div>
     </div>;
   }
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-background">
       {/* Navigation Header */}
-      <nav className="bg-white/90 backdrop-blur-sm sticky top-0 z-50 border-b border-sage/10">
+      <nav className="bg-card/90 backdrop-blur-sm sticky top-0 z-50 border-b border-border">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-xl font-semibold text-sage">Inspire</h1>
           <div className="flex items-center space-x-2">
@@ -191,7 +191,7 @@ export default function Home() {
           className="fixed top-16 left-1/2 transform -translate-x-1/2 z-40 transition-opacity duration-200"
           style={{ opacity: Math.min(pullDistance / 60, 1) }}
         >
-          <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg border border-sage/20">
+          <div className="bg-card/90 backdrop-blur-sm rounded-full p-2 shadow-lg border border-border">
             <RefreshCcw className={`w-5 h-5 text-sage ${pullDistance > 60 ? 'animate-spin' : ''}`} />
           </div>
         </div>
@@ -199,7 +199,7 @@ export default function Home() {
 
       {/* Main Container */}
       <div 
-        className="max-w-md mx-auto bg-white min-h-screen shadow-xl pb-20"
+        className="max-w-md mx-auto bg-card min-h-screen shadow-xl pb-20"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -241,7 +241,7 @@ export default function Home() {
           <div className="grid grid-cols-2 gap-4">
             <Button
               variant="outline"
-              className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-left border border-sage/10 h-auto"
+              className="bg-card rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-left border border-border h-auto"
               onClick={() => window.location.href = "/journal"}
             >
               <div className="flex items-center space-x-3">
@@ -249,7 +249,7 @@ export default function Home() {
                   <Pen className="w-5 h-5 text-sage" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-warm-gray text-sm">Journal</h3>
+                  <h3 className="font-medium text-card-foreground text-sm">Journal</h3>
                   <p className="text-xs text-sage">Write & reflect</p>
                 </div>
               </div>
@@ -257,7 +257,7 @@ export default function Home() {
 
             <Button
               variant="outline"
-              className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-left border border-sage/10 h-auto"
+              className="bg-card rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-left border border-border h-auto"
               onClick={() => window.location.href = "/reminders"}
             >
               <div className="flex items-center space-x-3">
@@ -265,7 +265,7 @@ export default function Home() {
                   <Bell className="w-5 h-5 text-gold" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-warm-gray text-sm">Reminders</h3>
+                  <h3 className="font-medium text-card-foreground text-sm">Reminders</h3>
                   <p className="text-xs text-sage">Daily inspiration</p>
                 </div>
               </div>
@@ -273,7 +273,7 @@ export default function Home() {
 
             <Button
               variant="outline"
-              className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-left border border-sage/10 h-auto"
+              className="bg-card rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-left border border-border h-auto"
               onClick={() => window.location.href = "/goals"}
             >
               <div className="flex items-center space-x-3">
@@ -281,7 +281,7 @@ export default function Home() {
                   <Target className="w-5 h-5 text-success" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-warm-gray text-sm">Goals</h3>
+                  <h3 className="font-medium text-card-foreground text-sm">Goals</h3>
                   <p className="text-xs text-sage">Vision board</p>
                 </div>
               </div>
@@ -289,7 +289,7 @@ export default function Home() {
 
             <Button
               variant="outline"
-              className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-left border border-sage/10 h-auto"
+              className="bg-card rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-left border border-border h-auto"
               disabled
             >
               <div className="flex items-center space-x-3">
@@ -297,7 +297,7 @@ export default function Home() {
                   <Brain className="w-5 h-5 text-sage" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-warm-gray text-sm">Mental Models</h3>
+                  <h3 className="font-medium text-card-foreground text-sm">Mental Models</h3>
                   <p className="text-xs text-sage">Learn & grow</p>
                 </div>
               </div>
@@ -347,28 +347,28 @@ export default function Home() {
 
             return sortedActivities.length > 0 ? (
               <div className="space-y-4">
-                <h3 className="text-lg font-medium text-warm-gray">Recent Activity</h3>
+                <h3 className="text-lg font-medium text-card-foreground">Recent Activity</h3>
                 <div className="space-y-3">
                   {sortedActivities.map((activity) => (
-                    <Card key={`${activity.type}-${activity.id}`} className="shadow-sm border border-sage/10">
+                    <Card key={`${activity.type}-${activity.id}`} className="shadow-sm border border-border">
                       <CardContent className="p-4">
                         <div className="flex items-start space-x-3">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            activity.type === 'journal' ? 'bg-sage/10' : 'bg-blue-50'
+                            activity.type === 'journal' ? 'bg-sage/10' : 'bg-blue-500/10 dark:bg-blue-400/10'
                           }`}>
                             {activity.type === 'journal' ? (
                               <Pen className="w-4 h-4 text-sage" />
                             ) : (
-                              <Target className="w-4 h-4 text-blue-600" />
+                              <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
                             {activity.type === 'goal' && activity.title && (
-                              <p className="text-sm font-medium text-warm-gray mb-1">
+                              <p className="text-sm font-medium text-card-foreground mb-1">
                                 {activity.title}
                               </p>
                             )}
-                            <p className={`text-sm text-warm-gray line-clamp-2 ${
+                            <p className={`text-sm text-card-foreground line-clamp-2 ${
                               activity.type === 'goal' && activity.title ? 'text-xs' : ''
                             }`}>
                               {activity.text}

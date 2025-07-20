@@ -94,7 +94,7 @@ export default function Settings() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-sage">Loading...</div>
       </div>
     );
@@ -105,9 +105,9 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-sage/10 sticky top-0 z-50">
+      <div className="bg-card border-b border-border sticky top-0 z-50">
         <div className="max-w-md mx-auto px-4 py-4">
           <div className="flex items-center space-x-3">
             <Button
@@ -118,14 +118,14 @@ export default function Settings() {
             >
               <ArrowLeft className="w-5 h-5 text-sage" />
             </Button>
-            <h1 className="text-xl font-semibold text-warm-gray">Settings</h1>
+            <h1 className="text-xl font-semibold text-card-foreground">Settings</h1>
           </div>
         </div>
       </div>
 
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
         {/* Theme Settings */}
-        <Card className="shadow-sm border border-sage/10">
+        <Card className="shadow-sm border border-border">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center space-x-2">
               {getThemeIcon()}
@@ -153,7 +153,7 @@ export default function Settings() {
         </Card>
 
         {/* Auto Refresh Settings */}
-        <Card className="shadow-sm border border-sage/10">
+        <Card className="shadow-sm border border-border">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center space-x-2">
               <RefreshCw className="w-5 h-5" />
@@ -201,7 +201,7 @@ export default function Settings() {
         </Card>
 
         {/* Sources Settings */}
-        <Card className="shadow-sm border border-sage/10">
+        <Card className="shadow-sm border border-border">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center space-x-2">
               <Users className="w-5 h-5" />
@@ -224,7 +224,7 @@ export default function Settings() {
         </Card>
 
         {/* Account Settings */}
-        <Card className="shadow-sm border border-sage/10">
+        <Card className="shadow-sm border border-border">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg">Account</CardTitle>
           </CardHeader>
@@ -280,9 +280,9 @@ function SourcesSettings({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-sage/10 sticky top-0 z-50">
+      <div className="bg-card border-b border-border sticky top-0 z-50">
         <div className="max-w-md mx-auto px-4 py-4">
           <div className="flex items-center space-x-3">
             <Button
@@ -293,7 +293,7 @@ function SourcesSettings({ onBack }: { onBack: () => void }) {
             >
               <ArrowLeft className="w-5 h-5 text-sage" />
             </Button>
-            <h1 className="text-xl font-semibold text-warm-gray">Inspiration Sources</h1>
+            <h1 className="text-xl font-semibold text-card-foreground">Inspiration Sources</h1>
           </div>
         </div>
       </div>
@@ -301,7 +301,7 @@ function SourcesSettings({ onBack }: { onBack: () => void }) {
       <div className="max-w-md mx-auto px-4 py-6">
         <div className="text-center py-12">
           <Users className="w-12 h-12 text-sage mx-auto mb-4" />
-          <h2 className="text-lg font-medium text-warm-gray mb-2">
+          <h2 className="text-lg font-medium text-card-foreground mb-2">
             Sources Management
           </h2>
           <p className="text-sage mb-6">
