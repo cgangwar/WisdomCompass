@@ -162,7 +162,7 @@ export default function Home() {
       {/* Navigation Header */}
       <nav className="bg-card/90 backdrop-blur-sm sticky top-0 z-50 border-b border-border">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-sage">Inspire</h1>
+          <h1 className="text-xl font-semibold text-sage">Wisdom Compass</h1>
           <div className="flex items-center space-x-2">
             <Button
               variant="ghost"

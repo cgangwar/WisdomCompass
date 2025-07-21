@@ -143,7 +143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       console.error("Error pinning quote:", error);
-      if (error.message === 'Quote is already pinned') {
+      if (error instanceof Error && error.message === 'Quote is already pinned') {
         res.status(400).json({ message: "Quote is already pinned" });
       } else {
         res.status(500).json({ message: "Failed to pin quote" });
@@ -291,6 +291,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting reminder:", error);
       res.status(500).json({ message: "Failed to delete reminder" });
+    }
+  });
+
+  // PWA-specific routes
+  app.get('/manifest.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/manifest+json');
+    try {
+      res.sendFile('manifest.json', { root: './client/public' });
+    } catch (error) {
+      res.status(404).json({ error: 'Manifest not found' });
+    }
+  });
+  
+  app.get('/sw.js', (req, res) => {
+    res.setHeader('Content-Type', 'application/javascript');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    try {
+      res.sendFile('sw.js', { root: './client/public' });
+    } catch (error) {
+      res.status(404).json({ error: 'Service worker not found' });
+    }
+  });
+  
+  app.get('/browserconfig.xml', (req, res) => {
+    res.setHeader('Content-Type', 'application/xml');
+    try {
+      res.sendFile('browserconfig.xml', { root: './client/public' });
+    } catch (error) {
+      res.status(404).json({ error: 'Browser config not found' });
     }
   });
 

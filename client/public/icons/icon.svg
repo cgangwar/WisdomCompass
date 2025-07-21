@@ -1,0 +1,41 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="256" fill="#8B9A7A"/>
+  
+  <!-- Compass Ring -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="#FEFCF7" stroke-width="8"/>
+  <circle cx="256" cy="256" r="170" fill="none" stroke="#FEFCF7" stroke-width="4"/>
+  
+  <!-- Compass Points -->
+  <!-- North -->
+  <polygon points="256,80 266,110 256,100 246,110" fill="#FEFCF7"/>
+  <text x="256" y="70" text-anchor="middle" fill="#FEFCF7" font-family="serif" font-size="24" font-weight="bold">N</text>
+  
+  <!-- East -->
+  <polygon points="432,256 402,246 412,256 402,266" fill="#FEFCF7"/>
+  <text x="442" y="261" text-anchor="middle" fill="#FEFCF7" font-family="serif" font-size="24" font-weight="bold">E</text>
+  
+  <!-- South -->
+  <polygon points="256,432 246,402 256,412 266,402" fill="#FEFCF7"/>
+  <text x="256" y="450" text-anchor="middle" fill="#FEFCF7" font-family="serif" font-size="24" font-weight="bold">S</text>
+  
+  <!-- West -->
+  <polygon points="80,256 110,266 100,256 110,246" fill="#FEFCF7"/>
+  <text x="70" y="261" text-anchor="middle" fill="#FEFCF7" font-family="serif" font-size="24" font-weight="bold">W</text>
+  
+  <!-- Center Compass Rose -->
+  <circle cx="256" cy="256" r="60" fill="#FEFCF7"/>
+  <circle cx="256" cy="256" r="50" fill="#8B9A7A"/>
+  
+  <!-- Compass Needle -->
+  <polygon points="256,210 270,250 256,270 242,250" fill="#D4AF37"/>
+  <polygon points="256,210 242,250 256,240 270,250" fill="#FEFCF7"/>
+  
+  <!-- Wisdom Symbol - Book -->
+  <rect x="230" y="240" width="52" height="32" rx="4" fill="#FEFCF7"/>
+  <rect x="234" y="244" width="44" height="24" rx="2" fill="#8B9A7A"/>
+  <line x1="238" y1="248" x2="274" y2="248" stroke="#FEFCF7" stroke-width="1"/>
+  <line x1="238" y1="252" x2="270" y2="252" stroke="#FEFCF7" stroke-width="1"/>
+  <line x1="238" y1="256" x2="274" y2="256" stroke="#FEFCF7" stroke-width="1"/>
+  <line x1="238" y1="260" x2="266" y2="260" stroke="#FEFCF7" stroke-width="1"/>
+</svg>
