@@ -294,6 +294,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Settings routes - Get user preferences
+  app.get('/api/settings/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const preferences = await storage.getUserPreferences(userId);
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error fetching user preferences:", error);
+      res.status(500).json({ message: "Failed to fetch preferences" });
+    }
+  });
+
+  // Settings routes - Update character preferences
+  app.put('/api/settings/characters', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { characterIds } = req.body;
+      
+      if (!Array.isArray(characterIds)) {
+        return res.status(400).json({ message: "Character IDs must be an array" });
+      }
+
+      await storage.clearUserCharacters(userId);
+      for (const characterId of characterIds) {
+        await storage.addUserCharacter({ userId, characterId });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating character preferences:", error);
+      res.status(500).json({ message: "Failed to update character preferences" });
+    }
+  });
+
+  // Settings routes - Update philosophy preferences
+  app.put('/api/settings/philosophies', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { philosophyIds } = req.body;
+      
+      if (!Array.isArray(philosophyIds)) {
+        return res.status(400).json({ message: "Philosophy IDs must be an array" });
+      }
+
+      await storage.clearUserPhilosophies(userId);
+      for (const philosophyId of philosophyIds) {
+        await storage.addUserPhilosophy({ userId, philosophyId });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating philosophy preferences:", error);
+      res.status(500).json({ message: "Failed to update philosophy preferences" });
+    }
+  });
+
   // PWA-specific routes
   app.get('/manifest.json', (req, res) => {
     res.setHeader('Content-Type', 'application/manifest+json');

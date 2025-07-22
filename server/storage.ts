@@ -296,6 +296,39 @@ export class DatabaseStorage implements IStorage {
 
     await db.delete(reminders).where(eq(reminders.id, reminderId));
   }
+
+  // Get user preferences - characters and philosophies
+  async getUserPreferences(userId: string): Promise<{
+    characters: Character[],
+    philosophies: Philosophy[],
+    selectedCharacterIds: number[],
+    selectedPhilosophyIds: number[]
+  }> {
+    // Get all characters and philosophies
+    const [characters, philosophies] = await Promise.all([
+      this.getCharacters(),
+      this.getPhilosophies()
+    ]);
+
+    // Get user's selected characters
+    const selectedChars = await db
+      .select({ characterId: userCharacters.characterId })
+      .from(userCharacters)
+      .where(eq(userCharacters.userId, userId));
+    
+    // Get user's selected philosophies
+    const selectedPhils = await db
+      .select({ philosophyId: userPhilosophies.philosophyId })
+      .from(userPhilosophies)
+      .where(eq(userPhilosophies.userId, userId));
+
+    return {
+      characters,
+      philosophies,
+      selectedCharacterIds: selectedChars.map(c => c.characterId),
+      selectedPhilosophyIds: selectedPhils.map(p => p.philosophyId)
+    };
+  }
 }
 
 export const storage = new DatabaseStorage();
