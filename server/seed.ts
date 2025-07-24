@@ -233,75 +233,56 @@ const defaultPhilosophies = [
   }
 ];
 
+// Note: Character IDs will be assigned dynamically after insertion
 const defaultQuotes = [
   {
     text: "The happiness of your life depends upon the quality of your thoughts.",
     author: "Marcus Aurelius",
-    characterId: 1,
-    philosophyId: 1,
     category: "mindset"
   },
   {
     text: "What we think, we become.",
-    author: "Buddha",
-    characterId: 2,
-    philosophyId: 2,
+    author: "Buddha (Siddhartha Gautama)",
     category: "consciousness"
   },
   {
     text: "The only true wisdom is in knowing you know nothing.",
     author: "Socrates",
-    characterId: 3,
-    philosophyId: null,
     category: "wisdom"
   },
   {
     text: "Let yourself be silently drawn by the strange pull of what you really love. It will not lead you astray.",
     author: "Rumi",
-    characterId: 4,
-    philosophyId: null,
     category: "passion"
   },
   {
     text: "Everything can be taken from a man but one thing: the last of human freedoms - to choose one's attitude in any given set of circumstances.",
     author: "Viktor Frankl",
-    characterId: 5,
-    philosophyId: 3,
     category: "freedom"
   },
   {
     text: "If you don't like something, change it. If you can't change it, change your attitude.",
     author: "Maya Angelou",
-    characterId: 6,
-    philosophyId: null,
     category: "empowerment"
   },
   {
     text: "You have power over your mind - not outside events. Realize this, and you will find strength.",
     author: "Marcus Aurelius",
-    characterId: 1,
-    philosophyId: 1,
     category: "control"
   },
   {
     text: "Peace comes from within. Do not seek it without.",
-    author: "Buddha",
-    characterId: 2,
-    philosophyId: 2,
+    author: "Buddha (Siddhartha Gautama)",
     category: "peace"
   },
   {
     text: "The way is not in the sky. The way is in the heart.",
-    author: "Buddha",
-    characterId: 2,
-    philosophyId: 2,
+    author: "Buddha (Siddhartha Gautama)",
     category: "wisdom"
   },
   {
     text: "Yesterday I was clever, so I wanted to change the world. Today I am wise, so I am changing myself.",
     author: "Rumi",
-    characterId: 4,
-    philosophyId: null,
     category: "growth"
   }
 ];
@@ -319,17 +300,39 @@ export async function seedDatabase() {
 
     // Insert characters
     console.log('Inserting characters...');
-    await db.insert(characters).values(defaultCharacters);
+    const insertedCharacters = await db.insert(characters).values(defaultCharacters).returning();
 
     // Insert philosophies
     console.log('Inserting philosophies...');
-    await db.insert(philosophies).values(defaultPhilosophies);
+    const insertedPhilosophies = await db.insert(philosophies).values(defaultPhilosophies).returning();
 
-    // Insert quotes
+    // Insert quotes with proper character and philosophy references
     console.log('Inserting quotes...');
-    await db.insert(quotes).values(defaultQuotes);
+    const quotesWithRefs = defaultQuotes.map((quote) => {
+      // Find character by name
+      const character = insertedCharacters.find(c => 
+        c.name === quote.author || 
+        c.name.includes(quote.author.split(' ')[0])
+      );
 
-    console.log('Database seeded successfully!');
+      // Find philosophy based on character's likely tradition
+      let philosophy = null;
+      if (quote.author.includes('Marcus Aurelius')) {
+        philosophy = insertedPhilosophies.find(p => p.name === 'Stoicism');
+      } else if (quote.author.includes('Buddha')) {
+        philosophy = insertedPhilosophies.find(p => p.name === 'Buddhism');
+      }
+
+      return {
+        ...quote,
+        characterId: character?.id || null,
+        philosophyId: philosophy?.id || null
+      };
+    });
+
+    await db.insert(quotes).values(quotesWithRefs);
+
+    console.log(`Database seeded successfully with ${insertedCharacters.length} characters, ${insertedPhilosophies.length} philosophies, and ${quotesWithRefs.length} quotes!`);
   } catch (error) {
     console.error('Error seeding database:', error);
     throw error;
